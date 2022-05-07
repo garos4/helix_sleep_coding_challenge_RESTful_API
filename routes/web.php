@@ -17,7 +17,23 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
+$router->post('/api/login',  ['uses' => 'AuthController@login']);
 
-$router->group(['prefix' => 'api'], function () use ($router) {
-    $router->get('authors',  ['uses' => 'AuthorController@showAllAuthors']);
-});  
+$router->group(
+    [
+        'prefix' => 'api',
+        'middleware' => ['auth:api']
+    ],
+    function () use ($router) {
+        $router->get('/products',  ['uses' => 'ProductController@index']);
+        $router->post('/products',  ['uses' => 'ProductController@store']);
+        $router->post('/products/{id}',  ['uses' => 'ProductController@update']);
+        $router->delete('/products/{id}',  ['uses' => 'ProductController@destroy']);
+
+        $router->get('/products/{id}',  ['uses' => 'ProductController@show']);
+        $router->get('/attach/products/{id}',  ['uses' => 'UserProductController@attach']);
+        $router->get('/remove/products/{id}',  ['uses' => 'UserProductController@remove']);
+
+        $router->get('/user/products',  ['uses' => 'UserProductController@userProducts']);
+    }
+);

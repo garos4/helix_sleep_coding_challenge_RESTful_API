@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class UsersTableSeeder extends Seeder
 {
@@ -20,12 +21,14 @@ class UsersTableSeeder extends Seeder
             [
                 'first_name'=>'Benjamin', 
                 'last_name'=>'Mba', 
-                'email'=>'benmba4@gmail.com'
+                'email'=>'benmba4@gmail.com',
+                'password'=>'letmein'
             ],
             [
                 'first_name'=>'Kristoffer', 
                 'last_name'=>'Tonning', 
-                'email'=>'kristoffer@helixsleep.com'
+                'email'=>'kristoffer@helixsleep.com',
+                'password'=>'letmein'
             ],
         ];
 
@@ -36,9 +39,11 @@ class UsersTableSeeder extends Seeder
             $user_record= User::where('email',$user['email'])->first();
             
             if($user_record){
+                
                 // if email already exists, update the first name and last name
                 $user_record->first_name = $user['first_name'];
                 $user_record->last_name = $user['last_name'];
+                $user_record->password = Hash::make($user['password']);
                 $user_record->save();
            
             }
@@ -46,12 +51,15 @@ class UsersTableSeeder extends Seeder
 
                 // if it does not exist, that means we have a new user record 
                 // so we create and save it
-                $user = new User();
-                $user->first_name = $user['first_name'];
-                $user->last_name = $user['last_name'];
-                $user->save();
-            } 
+                $user_record = new User();
+                $user_record->first_name = $user['first_name'];
+                $user_record->last_name = $user['last_name'];
+                $user_record->email = $user['email'];
+                $user_record->password = Hash::make($user['password']);
+                $user_record->save();
 
+                $user_record->createToken('ChallengeApp')->accessToken;
+            } 
             
         }
         
